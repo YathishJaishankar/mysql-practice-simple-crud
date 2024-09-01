@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <form action="" class="container" id="loginForm">
+        <input type="email" class="formey" id="loginEmail" placeholder="Email" required>
+        <input type="password" class="formey" id="loginPassword" placeholder="Password" required>
+        <button type="submit" id="button">Login</button>
+        <p id="login-error-message"></p> <!-- Error message display -->
+        <p>Don't have an account? <a href="index.html">Register here</a></p>
+    </form>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const loginEmail = document.getElementById('loginEmail').value.trim();
+            const loginPassword = document.getElementById('loginPassword').value.trim();
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: loginEmail, password: loginPassword })
+            }).then(response => {
+                if (response.ok) {
+                    sessionStorage.setItem('loggedIn', 'true'); // Set session status
+                    window.location.href = 'landing.html'; // Redirect to landing page
+                } else {
+                    response.text().then(text => {
+                        document.getElementById('login-error-message').textContent = text;
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

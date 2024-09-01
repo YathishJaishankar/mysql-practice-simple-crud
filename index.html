@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Register</title>
+    <style>
+        /* Add styles for the password field container */
+        .password-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-container input {
+            width: calc(100% - 40px); /* Adjust width to make space for the icon */
+            padding-right: 40px; /* Space for the icon */
+        }
+
+        .password-container .eye-icon {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Register</h1>
+    <form action="" class="container" id="registerForm">
+        <input type="text" class="formey" id="firstName" placeholder="First Name" required>
+        <input type="text" class="formey" id="lastName" placeholder="Last Name" required>
+        <input type="date" class="formey" id="dob" placeholder="Date of Birth" required>
+        <input type="email" class="formey" id="email" placeholder="Email" required>
+        
+        <!-- Password field with eye icon -->
+        <div class="password-container">
+            <input type="password" class="formey" id="password" placeholder="Password" required>
+            <span class="eye-icon" id="togglePassword">&#128065;</span> <!-- Unicode for eye icon -->
+        </div>
+        
+        <input type="number" class="formey" id="age" placeholder="Age" required>
+        <button type="submit" id="button">Submit</button>
+        <p id="error-message"></p> <!-- Error message display -->
+    </form>
+    <p id="already-registered">Already registered? <a href="login.html">Login here</a></p>
+
+    <script src="script.js"></script>
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordField = document.getElementById('password');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🔒'; // Change icon based on visibility
+        });
+    </script>
+</body>
+</html>

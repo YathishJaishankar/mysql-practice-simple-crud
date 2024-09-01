@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="landing.css"> <!-- Link to your new CSS file -->
+    <title>Welcome</title>
+    <style>
+        /* Additional styles for logout button */
+        #logoutButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #logoutButton:hover {
+            background-color: #c82333;
+        }
+        #userDetails {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        #updateForm {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        #updateForm input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        #updateButton {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #updateButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="welcomeMessage">Welcome </h1>
+    <p id="greeting"></p>
+    <button id="logoutButton">Logout</button>
+    <div id="userDetails"></div>
+
+    <div id="updateForm" style="display:none;">
+        <h2>Update Your Details</h2>
+        <form id="formUpdate">
+            <input type="text" id="updateFirstName" placeholder="First Name">
+            <input type="text" id="updateLastName" placeholder="Last Name">
+            <input type="date" id="updateDob">
+            <input type="number" id="updateAge" placeholder="Age">
+            <button type="button" id="updateButton">Update</button>
+        </form>
+    </div>
+
+    <script>
+        // Handle logout
+        document.getElementById('logoutButton').addEventListener('click', function () {
+            fetch('/logout', {
+                method: 'POST'
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = 'login.html'; // Redirect to login page
+                }
+            });
+        });
+
+        // Fetch user data and format date
+        fetch('/user-details')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Not authenticated');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const welcomeMessage = document.getElementById('welcomeMessage');
+                const userDetails = document.getElementById('userDetails');
+                const dob = new Date(data.dob);
+                const formattedDate = `${String(dob.getDate()).padStart(2, '0')}-${String(dob.getMonth() + 1).padStart(2, '0')}-${dob.getFullYear()}`;
+                welcomeMessage.textContent = `Welcome, ${data.first_name}`;
+                userDetails.innerHTML = `
+                    <p><strong>First Name:</strong> ${data.first_name}</p>
+                    <p><strong>Last Name:</strong> ${data.last_name}</p>
+                    <p><strong>Date of Birth:</strong> ${formattedDate}</p>
+                    <p><strong>Age:</strong> ${data.age}</p>
+                `;
+                
+                // Pre-fill update form
+                document.getElementById('updateFirstName').value = data.first_name;
+                document.getElementById('updateLastName').value = data.last_name;
+                document.getElementById('updateDob').value = data.dob.split('T')[0];
+                document.getElementById('updateAge').value = data.age;
+
+                // Show update form
+                document.getElementById('updateForm').style.display = 'block';
+            })
+            .catch(error => {
+                // Redirect to login page if not authenticated
+                window.location.href = 'login.html';
+            });
+
+        // Handle update
+        document.getElementById('updateButton').addEventListener('click', function () {
+            const updatedFirstName = document.getElementById('updateFirstName').value.trim();
+            const updatedLastName = document.getElementById('updateLastName').value.trim();
+            const updatedDob = document.getElementById('updateDob').value;
+            const updatedAge = document.getElementById('updateAge').value.trim();
+
+            fetch('/update-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    firstName: updatedFirstName,
+                    lastName: updatedLastName,
+                    dob: updatedDob,
+                    age: updatedAge
+                }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('User details updated successfully.');
+                    window.location.reload(); // Reload page to reflect changes
+                } else {
+                    return response.text().then(text => {
+                        alert(text);
+                    });
+                }
+            })
+            .catch(error => {
+                alert('An error occurred. Please try again.');
+            });
+        });
+    </script>
+</body>
+</html>
